@@ -9,6 +9,8 @@ const KNOWLEDGE_DIR = path.resolve(__dirname, "../knowledge");
 
 const pc = new Pinecone({ apiKey: process.env.PINECONE_KEY })
 
+const namespace = pc.index(process.env.PINECONE_INDEX_NAME).namespace("policies");
+
 
 async function readAllFiles(req, res) {
 
@@ -70,9 +72,6 @@ async function readAllFiles(req, res) {
         // Create embeddings
         await createvectors(allFilesData);
 
-
-
-
         // Send response AFTER processing
         res.status(200).json({
             message: "All PDF data",
@@ -95,25 +94,38 @@ async function createvectors(allFilesData) {
 
     for (const file of allFilesData) {
 
-        // Skip files which failed to parse
-        if (!file.chunks) {
+        if (!Array.isArray(file.chunks)) {
             continue;
         }
 
-        console.log("\nProcessing:", file.fileName);
+        console.log("Processing:", file.fileName);
 
         for (const [index, chunk] of file.chunks.entries()) {
 
             console.log(`Creating embedding for chunk ${index}`);
 
-            const response = await createEmbedding(chunk);
+            const vector = await createEmbedding(chunk);
 
-            console.log("Vector created successfully");
-            console.log(response);
+            console.log("Vector dimensions:", vector.length);
+
+            await namespace.upsert({
+                records: [
+                    {
+                        id: `${file.fileName}-${index}`,
+                        values: vector,
+                        metadata: {
+                            fileName: file.fileName,
+                            chunkIndex: index,
+                            text: chunk
+                        }
+                    }
+                ]
+            });
+
+            console.log("Stored in Pinecone successfully");
         }
     }
 }
-
 
 
 
