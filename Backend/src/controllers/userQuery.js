@@ -34,7 +34,7 @@ async function userQuery(req , res) {
 
         const mainResult = result.matches.map(match => match.metadata.text);
 
-        console.log(mainResult)
+       // console.log(mainResult)
 
         const response = await chatBot(mainResult , userQuery)
 
@@ -55,8 +55,6 @@ async function userQuery(req , res) {
     }
     
 }
-
-
 
 module.exports = {
     userQuery

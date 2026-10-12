@@ -50,7 +50,7 @@ async function chatBot(mainResult, userQuery) {
             `;
 
         const interaction = await ai.interactions.create({
-            model: "gemini-3.6-flash",
+            model: "gemini-3.1-flash-lite",
 
             system_instruction: system_prompt,
 

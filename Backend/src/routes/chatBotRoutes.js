@@ -9,7 +9,7 @@ const userQueryController = require("../controllers/userQuery")
 router.post("/readFiles" , fileController.readAllFiles)
 
 
-router.get("/userInput" , userQueryController.userQuery)
+router.post("/userInput" , userQueryController.userQuery)
 
 
-module.exports = router
+module.exports = router 
